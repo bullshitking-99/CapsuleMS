@@ -1,21 +1,26 @@
 <template>
   <div>
-    <div class="crumbs">
-      <el-breadcrumb>
+    <div class="crumbs" style="display:flex;justify-content:center;">
+      <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-s-order"></i> 查看考勤
+          <i class="el-icon-s-order"></i> 课堂考勤
         </el-breadcrumb-item>
+        <el-breadcrumb-item> <i></i>查看考勤 </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
       <!--课程名称选择栏-->
 
-      <el-form label-width="120px">
+      <el-form
+        label-width="120px"
+        style="display:flex;justify-content:center;align-items:center "
+      >
         <el-form-item label="课程名称">
           <el-select
             v-model="selectedClassRoom"
-            style="width: 470px"
+            style="width: 300px"
             placeholder="请选择"
+            @focus="getclassnames"
           >
             <el-option
               v-for="item in classRoomList"
@@ -60,25 +65,15 @@
 </template>
 
 <script>
+import http from "@/api/chatroom";
 export default {
   //data is a function
   data() {
     return {
+      userId: "",
+      myClassRoom: [],
       selectedClassRoom: "",
-      classRoomList: [
-        {
-          value: "1",
-          label: "操作系统",
-        },
-        {
-          value: "2",
-          label: "数据结构",
-        },
-        {
-          value: "3",
-          label: "计算机网络",
-        },
-      ],
+      classRoomList: [],
       //表格使用数据
       atd_num: 0, //签到人数
       late_num: 0, //迟到人数
@@ -124,9 +119,33 @@ export default {
   },
   created() {
     this.numCounter();
+    this.userId = JSON.parse(localStorage.getItem("user")).id;
+    //console.log(this.userId);
   },
+
   //methods is a object
   methods: {
+    //点击select获取该用户的课程名
+    getclassnames() {
+      //接口获取该用户的所有签到课堂信息（同名多周课堂会有多个对象，每个对象为一个聊天室
+      http.findMyClassRooms(this.userId).then((res) => {
+        res.forEach((element) => {
+          this.myClassRoom.push(element.name);
+        });
+        //给classname去重
+        this.myClassRoom = [...new Set(this.myClassRoom)];
+        console.log(this.myClassRoom);
+
+        //根据classname的值按指定格式创建组件需要的classroomlist数组
+        this.myClassRoom.forEach((ele) => {
+          let classroom = {};
+          classroom.label = ele;
+          classroom.value = ele;
+          //console.log(classroom);
+          this.classRoomList.push(classroom);
+        });
+      });
+    },
     //:row-class-name会传入一个对象作为参数:{row:{date,time,name..}, rowIndex:},所以下面这个函数的参数需要使用解构赋值
     tableRowClassName({ row }) {
       if (row.time > this.atd_time) {

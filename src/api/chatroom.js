@@ -2,6 +2,9 @@ import request from "../utils/request";
 export function addClassRooms(params) {
   return request.post("/addClassRooms", params);
 }
+export function findMyClassRooms(params) {
+  return request.get("/findmyclassrooms/" + params);
+}
 export function addChatRoom(params) {
   return request.post("/newAddChatRoom", params);
 }
@@ -39,6 +42,7 @@ export function getUserCountReal(roomId) {
 }
 export default {
   addClassRooms,
+  findMyClassRooms,
   addChatRoom,
   deleteChatRoom,
   updateChatRoom,

@@ -1,16 +1,21 @@
 <template>
   <div>
-    <div class="crumbs">
-      <el-breadcrumb>
+    <div class="crumbs" style="display:flex;justify-content:center;">
+      <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-s-order"></i> 增加考勤
+          <i class="el-icon-s-order"></i>课堂考勤
         </el-breadcrumb-item>
+        <el-breadcrumb-item> <i></i>增加考勤 </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <div class="container">
+
+    <div
+      class="container"
+      style="width:97%;display:flex;justify-content:center;align-items:center "
+    >
       <div class="form-box">
         <!-- 课堂名称与课堂教室 共一个el-form -->
-        <el-form label-width="150px">
+        <el-form label-width="100px">
           <el-form-item label="课程名称">
             <el-input
               v-model="form.name"
@@ -35,10 +40,23 @@
               </el-option>
             </el-select>
           </el-form-item>
+
+          <!--学期开始时间-->
+          <el-form-item label="开学时间">
+            <el-date-picker
+              v-model="term_beginTime"
+              type="date"
+              placeholder="请设置学期开始时间"
+              format="YYYY/MM/DD"
+              style="width: 100%"
+              @change="getTerm_beginTime"
+            >
+            </el-date-picker>
+          </el-form-item>
         </el-form>
 
         <!-- 课堂日期 使用单选Radio按钮 -->
-        <el-form label-width="150px">
+        <el-form label-width="100px">
           <el-form-item label="课程日期">
             <el-row type="flex" justify="center">
               <el-radio-group v-model="ClassTime_day" size="small">
@@ -55,30 +73,37 @@
         </el-form>
 
         <!-- 课堂日期时间 行内使用两个级联选择器 -->
-        <el-form :inline="true" label-width="150px" style="width:800px">
+        <el-form :inline="true" label-width="100px" style="width:800px">
           <el-form-item label="签到起始时间">
             <el-cascader
               v-model="atdTime_s"
               :options="options_s"
               :props="{ expandTrigger: 'hover' }"
               style="width:170px"
-              @change="changeDisabled_end"
             ></el-cascader>
           </el-form-item>
-          <el-form-item> 
-            <el-form-item label="签到结束时间" label-width="100px">
-              <el-cascader
-                v-model="atdTime_e"
-                :options="options_e"
-                :props="{ expandTrigger: 'hover' }"
-                style="width:170px"
-              ></el-cascader>
+          <el-form-item>
+            <el-form-item label="签到持续时间" label-width="100px">
+              <el-select
+                v-model="atd_DuringTime"
+                style="width: 170px"
+                placeholder="请选择"
+                @change="countEndTime"
+              >
+                <el-option
+                  v-for="item in time_Options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-form-item>
         </el-form>
 
         <!-- 签到周期 使用slider滑块 进行区域选择-->
-        <el-form label-width="150px">
+        <el-form label-width="100px">
           <el-form-item label="签到周期">
             <el-slider
               v-model="atdWeeks"
@@ -92,12 +117,12 @@
           </el-form-item>
         </el-form>
         <!-- 提交与重置按钮 -->
-        <el-form label-width="250px" style="margin-top: 50px">
+        <el-form label-width="200px" style="margin-top: 50px">
           <el-form-item>
             <el-button type="primary" :style="inputStyle" @click="onSubmit"
               >提交</el-button
             >
-            <el-button style="margin-left: 100px" @click="onReset"
+            <el-button style="margin-left: 80px" @click="onReset"
               >重置</el-button
             >
           </el-form-item>
@@ -125,6 +150,10 @@ export default {
       },
       //请求获取已有的聊天室地址
       locationList: [],
+      //学期开始时间
+      term_beginTime: "",
+      //学期开始时间
+      term_endTime: "",
       //课程日期
       ClassTime_day: "1",
       //级联选择器选项-签到起始时间
@@ -158,19 +187,19 @@ export default {
           children: [
             {
               value: "13:30:00",
-              label: "第一节课",
+              label: "第五节课",
             },
             {
               value: "14:20:00",
-              label: "第二节课",
+              label: "第六节课",
             },
             {
               value: "15:25:00",
-              label: "第三节课",
+              label: "第七节课",
             },
             {
               value: "16:15:00",
-              label: "第四节课",
+              label: "第八节课",
             },
           ],
         },
@@ -180,108 +209,40 @@ export default {
           children: [
             {
               value: "18:00:00",
-              label: "第一节课",
+              label: "第九节课",
             },
             {
               value: "18:50:00",
-              label: "第二节课",
+              label: "第十节课",
             },
             {
               value: "19:55:00",
-              label: "第三节课",
+              label: "第十一节课",
             },
             {
               value: "20:45:00",
-              label: "第四节课",
+              label: "第十二节课",
             },
           ],
         },
       ],
-      //级联选择器选项-签到结束时间
-      atdTime_e: [],
-      options_e: [
+      //select选择器选项-签到持续时间
+      atd_DuringTime: "",
+      time_Options: [
         {
-          value: "1",
-          label: "上午",
-          disabled: false,
-          children: [
-            {
-              value: "08:45:00",
-              label: "第一节课",
-              disabled: false,
-            },
-            {
-              value: "09:35:00",
-              label: "第二节课",
-              disabled: false,
-            },
-            {
-              value: "10:40:00",
-              label: "第三节课",
-              disabled: false,
-            },
-            {
-              value: "11:30:00",
-              label: "第四节课",
-              disabled: false,
-            },
-          ],
+          value: "5",
+          label: "五分钟",
         },
         {
-          value: "2",
-          label: "下午",
-          disabled: false,
-          children: [
-            {
-              value: "14:15:00",
-              label: "第一节课",
-              disabled: false,
-            },
-            {
-              value: "15:05:00",
-              label: "第二节课",
-              disabled: false,
-            },
-            {
-              value: "16:10:00",
-              label: "第三节课",
-              disabled: false,
-            },
-            {
-              value: "17:00:00",
-              label: "第四节课",
-              disabled: false,
-            },
-          ],
+          value: "10",
+          label: "十分钟",
         },
         {
-          value: "3",
-          label: "晚上",
-          disabled: false,
-          children: [
-            {
-              value: "18:45:00",
-              label: "第一节课",
-              disabled: false,
-            },
-            {
-              value: "19:35:00",
-              label: "第二节课",
-              disabled: false,
-            },
-            {
-              value: "20:40:00",
-              label: "第三节课",
-              disabled: false,
-            },
-            {
-              value: "21:30:00",
-              label: "第四节课",
-              disabled: false,
-            },
-          ],
+          value: "15",
+          label: "十五分钟",
         },
       ],
+      atdTime_e: "",
       //范围滑块-签到周期
       atdWeeks: [15, 50], //除以5就是代表的周数
       marks: {
@@ -310,7 +271,6 @@ export default {
   created() {
     this.getUser();
     this.getLocation();
-    console.log(this.form.location.length);
   },
   mounted() {},
 
@@ -333,8 +293,8 @@ export default {
   },
 
   methods: {
-    //动态实时修改签到结束时间选项的disabled
-    changeDisabled_end() {
+    //动态实时修改签到结束时间选项的disabled - 版本2弃用
+    /*    changeDisabled_end() {
       //console.log(this.atdTime_s[1]);
       this.options_e.forEach((value) => {
         if (value.value < this.atdTime_s[0]) {
@@ -346,8 +306,89 @@ export default {
           }
         });
       });
+    }, */
+    //获取签到结束时间 用个temp感觉很扎眼，肯定可以优化
+    countEndTime() {
+      //使用countTime函数得出签到结束时间
+      let duringtime = parseInt(this.atd_DuringTime);
+      //console.log(duringtime);
+      let temp = "2020-10-28 ";
+      temp = temp + this.atdTime_s[1];
+      let type = "m";
+      let D = this.countTime(temp, type, duringtime);
+      this.atdTime_e = D.split(" ")[1];
+      //console.log(D);
+      //console.log(this.atdTime_e);
     },
-
+    /**
+     * 时间加减
+     * @param date - 时间格式支持yyyy-MM-dd HH:mm:ss | yyyy/MM/dd HH:mm:ss
+     * @param type - 类型：h-小时加减 m-分钟加减 s-秒加减 mi-毫秒加减
+     * @param number - 加减的数值，负数表示减
+     * @return dateCalc - 加减后的时间，格式yyyy-MM-dd HH:mm:ss
+     */
+    countTime(date, type, number) {
+      var timestamp1 = Date.parse(new Date(date));
+      if (isNaN(timestamp1)) {
+        //兼容IE,safari...
+        date = date.replace(/-/gi, "/");
+        timestamp1 = Date.parse(new Date(date));
+      }
+      var timestamp2;
+      switch (type) {
+        case "h":
+          timestamp2 = timestamp1 + number * 60000 * 60;
+          break;
+        case "m":
+          timestamp2 = timestamp1 + number * 60000;
+          break;
+        case "s":
+          timestamp2 = timestamp1 + number * 1000;
+          break;
+        case "mi":
+          timestamp2 = timestamp1 + number;
+          break;
+      }
+      var date = new Date(timestamp2);
+      var Y = date.getFullYear() + "-";
+      var M =
+        (date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) + "-";
+      var D =
+        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+      var h =
+        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
+      var m =
+        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+        ":";
+      var s =
+        date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+      return Y + M + D + h + m + s;
+    },
+    /* -------------------------------------------------------------------------------------------- */
+    //用户选择学期开始时间时触发
+    getTerm_beginTime() {
+      // console.log(this.term_beginTime);
+      //时间格式转换 函数有点拉，直接toISOstring然后切片就行了
+      let changeTimeStyle = function(oldTime) {
+        // 时间转换
+        let datejson = new Date(oldTime).toJSON();
+        let date = new Date(+new Date(datejson) + 8 * 3600 * 1000)
+          .toISOString()
+          .replace(/T/g, " ")
+          .replace(/\.[\d]{3}Z/, "");
+        return date.split(" ")[0];
+      };
+      this.term_beginTime = changeTimeStyle(this.term_beginTime);
+      //console.log(this.term_beginTime);
+      //获取学期结束时间 133=19*7
+      let term_endTime = new Date(this.term_beginTime);
+      term_endTime = term_endTime.setDate(term_endTime.getDate() + 133); //变成时间戳
+      term_endTime = new Date(term_endTime);
+      this.term_endTime = changeTimeStyle(term_endTime);
+      //console.log(this.term_endTime);
+    },
     //获取用户信息
     getUser() {
       this.user = this.$store.state.user;
@@ -372,7 +413,7 @@ export default {
         });
       }
     },
-
+    /* -------------------------------------------------------------------------------------------- */
     //参数准备
     createParams() {
       //console.log(typeof this.atdTime_s);
@@ -397,36 +438,10 @@ export default {
       let endWeek = this.atdWeeks[1] / 5;
       //console.log(startWeeks);
 
-      //校历还分上学期下学期，要先获取当前时间进行判断
-      let date_now = new Date();
-      //获取当前月份
-      let month_now = date_now.getMonth() + 1;
-      //判断当前学期
-      let term_now;
-      month_now >= 2 && month_now <= 7
-        ? (term_now = "second_half")
-        : (term_now = "first_half");
-      //console.log(term_now);
-      //根据学期获得第1周起始时间
-      let term_week_beginTime;
-      term_now === "first_half"
-        ? (term_week_beginTime = "08-30")
-        : (term_week_beginTime = "02-21");
-      //如果当前月份<2且为上半学期，则开始时间年份应为当前年份-1
-      let atdYear;
-      month_now < 2
-        ? (atdYear = date_now.getFullYear() - 1)
-        : (atdYear = date_now.getFullYear());
-      //第19周的结束时间
-      let term_week_endTime;
-      term_now === "first_half"
-        ? (term_week_endTime = "01-09")
-        : (term_week_endTime = "07-17");
-
       //获取参数 => begin,end,weeknum => getweek(begin,end,weeknum)
-      let begin = atdYear + "-" + term_week_beginTime;
-      let end = date_now.getFullYear() + "-" + term_week_endTime;
-      let weeknum = this.ClassTime_day.codePointAt() - "0".codePointAt();
+      let begin = this.term_beginTime;
+      let end = this.term_endTime;
+      let weeknum = parseInt(this.ClassTime_day);
       //console.log(begin, end, weeknum);
       //获得课程时间段内周几(ClassTime_day)的具体时间
       let weekNumDay_list = this.getWeek(begin, end, weeknum);
@@ -438,7 +453,7 @@ export default {
 
       //获取当天签到起始时间与结束时间
       this.form.s_time = this.atdTime_s[1];
-      this.form.e_time = this.atdTime_e[1];
+      this.form.e_time = this.atdTime_e;
       //console.log(this.form.s_time);
 
       //整合参数列表
@@ -459,7 +474,7 @@ export default {
 
       return paramsList;
     },
-
+    /* -------------------------------------------------------------------------------------------- */
     /* 获取时间段内属于星期一(*)的日期们
      * begin: 开始时间 "2022-01-05"
      * end：结束时间
@@ -525,7 +540,7 @@ export default {
 
       return result;
     },
-
+    /* -------------------------------------------------------------------------------------------- */
     onSubmit() {
       //表单数据未填完则按钮点击无效
       if (
@@ -551,7 +566,7 @@ export default {
               this.$message.error("提交失败！");
             }
           })
-          .catch((res) => {
+          .catch(() => {
             this.$message.error("提交失败！");
           });
       }
