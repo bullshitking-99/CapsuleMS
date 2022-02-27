@@ -465,7 +465,7 @@ export default {
           location: location,
           s_time: value + " " + this.form.s_time,
           e_time: value + " " + this.form.e_time,
-          RESERVE: 1, //聊天室类别标识符。1为考勤专用
+          reserve: 1, //聊天室类别标识符。1为考勤专用
           creator: this.userId,
         };
         paramsList.push(params);

@@ -1,4 +1,8 @@
 import request from "../utils/request";
+
+export function findBySearch(params) {
+  return request.get("/findBySearch/", params);
+}
 export function addClassRooms(params) {
   return request.post("/addClassRooms", params);
 }
@@ -41,6 +45,7 @@ export function getUserCountReal(roomId) {
   return request.post("/userCountRealtime/" + roomId);
 }
 export default {
+  findBySearch,
   addClassRooms,
   findMyClassRooms,
   addChatRoom,
