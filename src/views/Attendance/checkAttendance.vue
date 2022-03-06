@@ -49,7 +49,7 @@
         >
           <template #header>
             <div class="card-header">
-              <span>第{{ cardIndex + 1 }}节</span>
+              <span>第{{ cardIndex + 1 }}次</span>
               <el-button class="button" type="primary" plain
                 ><i class="el-icon-document"></i>
                 查看考勤表
