@@ -74,21 +74,33 @@
 
         <!-- 课堂日期时间 行内使用两个级联选择器 -->
         <el-form :inline="true" label-width="100px" style="width:800px">
-          <el-form-item label="签到起始时间">
+          <el-form-item label="课堂起始时间">
             <el-cascader
               v-model="atdTime_s"
               :options="options_s"
               :props="{ expandTrigger: 'hover' }"
-              style="width:170px"
+              style="width:190px"
+              @change="changeDisabled_end"
             ></el-cascader>
           </el-form-item>
+          <el-form-item label="课堂结束时间" label-width="110px">
+            <el-cascader
+              v-model="atdTime_e"
+              :options="options_e"
+              :props="{ expandTrigger: 'hover' }"
+              style="width:190px"
+            ></el-cascader>
+          </el-form-item>
+        </el-form>
+
+        <!--签到持续时间-->
+        <el-form>
           <el-form-item>
             <el-form-item label="签到持续时间" label-width="100px">
               <el-select
                 v-model="atd_DuringTime"
-                style="width: 170px"
+                style="width: 100%"
                 placeholder="请选择"
-                @change="countEndTime"
               >
                 <el-option
                   v-for="item in time_Options"
@@ -156,7 +168,7 @@ export default {
       term_endTime: "",
       //课程日期
       ClassTime_day: "1",
-      //级联选择器选项-签到起始时间
+      //级联选择器选项-课堂起始时间
       atdTime_s: [],
       options_s: [
         {
@@ -165,19 +177,19 @@ export default {
           children: [
             {
               value: "08:00:00",
-              label: "第一节课",
+              label: "第一节课 - 08:00",
             },
             {
               value: "08:50:00",
-              label: "第二节课",
+              label: "第二节课 - 08:50",
             },
             {
               value: "09:55:00",
-              label: "第三节课",
+              label: "第三节课 - 09:55",
             },
             {
               value: "10:45:00",
-              label: "第四节课",
+              label: "第四节课 - 10:45",
             },
           ],
         },
@@ -187,19 +199,19 @@ export default {
           children: [
             {
               value: "13:30:00",
-              label: "第五节课",
+              label: "第五节课 - 13:30",
             },
             {
               value: "14:20:00",
-              label: "第六节课",
+              label: "第六节课 - 14:20",
             },
             {
               value: "15:25:00",
-              label: "第七节课",
+              label: "第七节课 - 15:25",
             },
             {
               value: "16:15:00",
-              label: "第八节课",
+              label: "第八节课 - 16:15",
             },
           ],
         },
@@ -209,19 +221,104 @@ export default {
           children: [
             {
               value: "18:00:00",
-              label: "第九节课",
+              label: "第九节课 - 18:00",
             },
             {
               value: "18:50:00",
-              label: "第十节课",
+              label: "第十节课 - 18:50",
             },
             {
               value: "19:55:00",
-              label: "第十一节课",
+              label: "第十一节课 - 19:55",
             },
             {
               value: "20:45:00",
-              label: "第十二节课",
+              label: "第十二节课 - 20:45",
+            },
+          ],
+        },
+      ],
+      //级联选择器选项-课堂结束时间
+      atdTime_e: [],
+      options_e: [
+        {
+          value: "1",
+          label: "上午",
+          disabled: false,
+          children: [
+            {
+              value: "08:45:00",
+              label: "第一节课 - 08:45",
+              disabled: false,
+            },
+            {
+              value: "09:35:00",
+              label: "第二节课 - 09:35",
+              disabled: false,
+            },
+            {
+              value: "10:40:00",
+              label: "第三节课 - 10:40",
+              disabled: false,
+            },
+            {
+              value: "11:30:00",
+              label: "第四节课 - 11:30",
+              disabled: false,
+            },
+          ],
+        },
+        {
+          value: "2",
+          label: "下午",
+          disabled: false,
+          children: [
+            {
+              value: "14:15:00",
+              label: "第五节课 - 14:15",
+              disabled: false,
+            },
+            {
+              value: "15:05:00",
+              label: "第六节课 - 15:05",
+              disabled: false,
+            },
+            {
+              value: "16:10:00",
+              label: "第七节课 - 16:10",
+              disabled: false,
+            },
+            {
+              value: "17:00:00",
+              label: "第八节课 - 17:00",
+              disabled: false,
+            },
+          ],
+        },
+        {
+          value: "3",
+          label: "晚上",
+          disabled: false,
+          children: [
+            {
+              value: "18:45:00",
+              label: "第九节课 - 18:45",
+              disabled: false,
+            },
+            {
+              value: "19:35:00",
+              label: "第十节课 - 19:35",
+              disabled: false,
+            },
+            {
+              value: "20:40:00",
+              label: "第十一节课 - 20:40",
+              disabled: false,
+            },
+            {
+              value: "21:30:00",
+              label: "第十二节课 - 21:30",
+              disabled: false,
             },
           ],
         },
@@ -242,7 +339,6 @@ export default {
           label: "十五分钟",
         },
       ],
-      atdTime_e: "",
       //范围滑块-签到周期
       atdWeeks: [15, 50], //除以5就是代表的周数
       marks: {
@@ -294,7 +390,7 @@ export default {
 
   methods: {
     //动态实时修改签到结束时间选项的disabled - 版本2弃用
-    /*    changeDisabled_end() {
+    changeDisabled_end() {
       //console.log(this.atdTime_s[1]);
       this.options_e.forEach((value) => {
         if (value.value < this.atdTime_s[0]) {
@@ -306,9 +402,9 @@ export default {
           }
         });
       });
-    }, */
+    },
     //获取签到结束时间 用个temp感觉很扎眼，肯定可以优化
-    countEndTime() {
+    /* countEndTime() {
       //使用countTime函数得出签到结束时间
       let duringtime = parseInt(this.atd_DuringTime);
       //console.log(duringtime);
@@ -319,7 +415,7 @@ export default {
       this.atdTime_e = D.split(" ")[1];
       //console.log(D);
       //console.log(this.atdTime_e);
-    },
+    }, */
     /**
      * 时间加减
      * @param date - 时间格式支持yyyy-MM-dd HH:mm:ss | yyyy/MM/dd HH:mm:ss
@@ -453,7 +549,7 @@ export default {
 
       //获取当天签到起始时间与结束时间
       this.form.s_time = this.atdTime_s[1];
-      this.form.e_time = this.atdTime_e;
+      this.form.e_time = this.atdTime_e[1];
       //console.log(this.form.s_time);
 
       //整合参数列表
@@ -466,6 +562,7 @@ export default {
           s_time: value + " " + this.form.s_time,
           e_time: value + " " + this.form.e_time,
           reserve: 1, //聊天室类别标识符。1为考勤专用
+          duringTime: this.atd_DuringTime, //签到持续时间
           creator: this.userId,
         };
         paramsList.push(params);

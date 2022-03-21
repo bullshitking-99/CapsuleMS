@@ -24,6 +24,22 @@ const routes = [
           ),
       },
       {
+        path: "/CreateRoom",
+        name: "CreateRoom",
+        meta: {
+          title: "新建聊天室",
+        },
+        component: () => import("../views/SpaceTimeChatRoom/CreateRoom.vue"),
+      },
+      {
+        path: "/ManageRoom",
+        name: "ManageRoom",
+        meta: {
+          title: "管理聊天室",
+        },
+        component: () => import("../views/SpaceTimeChatRoom/ManageRoom.vue"),
+      },
+      {
         path: "/attendance",
         name: "attendance",
         meta: {

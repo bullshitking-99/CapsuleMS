@@ -63,6 +63,21 @@ export default {
           title: "系统首页",
         },
         {
+          icon: "el-icon-place",
+          index: "-1",
+          title: "时空聊天室",
+          subs: [
+            {
+              index: "CreateRoom",
+              title: "新建聊天室",
+            },
+            {
+              index: "checkAttendance",
+              title: "管理聊天室",
+            },
+          ],
+        },
+        {
           icon: "el-icon-s-order",
           index: "0",
           title: "课堂考勤",
@@ -80,7 +95,7 @@ export default {
         {
           icon: "el-icon-s-operation",
           index: "1",
-          title: "聊天室管理",
+          title: "聊天室管理(旧版)",
           subs: [
             {
               index: "addChatRoom",
