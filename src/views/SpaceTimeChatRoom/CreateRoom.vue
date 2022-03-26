@@ -32,7 +32,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+/* 关于 scoped 和 深度选择器 >>> (别名::v-deep，使用>>>会提示错误)
+https://blog.csdn.net/wsln_123456/article/details/94382333?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_default&utm_relevant_index=2 */
+
 .container {
   height: 100%;
   padding: 0;
@@ -56,17 +59,17 @@ main > div {
   width: 25%;
   height: 80%;
 }
-main .el-card {
+::v-deep .el-card {
   width: 100%;
   height: 100%;
   border: none;
   transition: all 0.3s;
 }
-.el-card:hover {
+::v-deep .el-card:hover {
   transform: scale(1.05);
   box-shadow: 3px 3px 7px #606266;
 }
-.el-card__body {
+::v-deep .el-card__body {
   height: 100%;
   background-color: #409eff;
   color: aliceblue;
@@ -75,9 +78,7 @@ main .el-card {
   justify-content: center;
   align-items: center;
 }
-/* .classRoom {
-  background-image: url(../assets/img/classRoom.jpg);
-} */
+
 footer {
   position: absolute;
   bottom: 0%;

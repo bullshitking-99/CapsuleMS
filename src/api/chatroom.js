@@ -1,5 +1,7 @@
 import request from "../utils/request";
-
+export function addFunDuration(params) {
+  return request.post("/addFunDuration", params);
+}
 export function findBySearch(params) {
   return request.get("/findBySearch/", params);
 }
@@ -45,6 +47,7 @@ export function getUserCountReal(roomId) {
   return request.post("/userCountRealtime/" + roomId);
 }
 export default {
+  addFunDuration,
   findBySearch,
   addClassRooms,
   findMyClassRooms,

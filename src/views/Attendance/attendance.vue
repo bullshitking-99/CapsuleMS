@@ -164,7 +164,7 @@ export default {
       locationList: [],
       //学期开始时间
       term_beginTime: "",
-      //学期开始时间
+      //学期结束时间
       term_endTime: "",
       //课程日期
       ClassTime_day: "1",
@@ -390,6 +390,7 @@ export default {
 
   methods: {
     //动态实时修改签到结束时间选项的disabled - 版本2弃用
+    /*----------------------------------------------------*/
     changeDisabled_end() {
       //console.log(this.atdTime_s[1]);
       this.options_e.forEach((value) => {
@@ -403,19 +404,24 @@ export default {
         });
       });
     },
-    //获取签到结束时间 用个temp感觉很扎眼，肯定可以优化
-    /* countEndTime() {
+
+    //获取签到功能的结束时间 但返回的是当日时间 没有日期前缀
+    /*----------------------------------------------------*/
+    //用个temp感觉很扎眼，肯定可以优化
+    countEndTime() {
       //使用countTime函数得出签到结束时间
       let duringtime = parseInt(this.atd_DuringTime);
       //console.log(duringtime);
-      let temp = "2020-10-28 ";
+      let temp = "2020-10-28 "; //单纯为了迎合函数而添加的无用前缀
       temp = temp + this.atdTime_s[1];
-      let type = "m";
-      let D = this.countTime(temp, type, duringtime);
-      this.atdTime_e = D.split(" ")[1];
+      let D = this.countTime(temp, "m", duringtime);
+      //this.atdTime_e = D.split(" ")[1]; //这里是课堂结束时间为签到结束时间的老版本
+      return D.split(" ")[1];
       //console.log(D);
       //console.log(this.atdTime_e);
-    }, */
+    },
+
+    /*----------------------------------------------------*/
     /**
      * 时间加减
      * @param date - 时间格式支持yyyy-MM-dd HH:mm:ss | yyyy/MM/dd HH:mm:ss
@@ -462,8 +468,9 @@ export default {
         date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
       return Y + M + D + h + m + s;
     },
-    /* -------------------------------------------------------------------------------------------- */
+
     //用户选择学期开始时间时触发
+    /* -------------------------------------------------------------------------------------------- */
     getTerm_beginTime() {
       // console.log(this.term_beginTime);
       //时间格式转换 函数有点拉，直接toISOstring然后切片就行了
@@ -485,12 +492,16 @@ export default {
       this.term_endTime = changeTimeStyle(term_endTime);
       //console.log(this.term_endTime);
     },
+
     //获取用户信息
+    /*----------------------------------------------------*/
     getUser() {
       this.user = this.$store.state.user;
       this.userId = this.user.id;
     },
+
     //获取已有的可签到地址 - 结果为数组，元素为对象｛location，field｝
+    /*----------------------------------------------------*/
     getLocation() {
       //执行该函数前必须先获取userid
       if (this.user.accessfield === "0") {
@@ -509,9 +520,10 @@ export default {
         });
       }
     },
+
     /* -------------------------------------------------------------------------------------------- */
-    //参数准备
-    createParams() {
+    //准备聊天室基本参数
+    createRoomParams() {
       //console.log(typeof this.atdTime_s);
 
       //获取location和field - 将多选的location进行字符连接
@@ -561,8 +573,8 @@ export default {
           location: location,
           s_time: value + " " + this.form.s_time,
           e_time: value + " " + this.form.e_time,
-          reserve: 1, //聊天室类别标识符。1为考勤专用
-          duringTime: this.atd_DuringTime, //签到持续时间
+          reserve: "1", //聊天室类别标识符。1为考勤专用
+          // duringTime: this.atd_DuringTime, //签到持续时间 更改至funduration接口中
           creator: this.userId,
         };
         paramsList.push(params);
@@ -571,6 +583,25 @@ export default {
 
       return paramsList;
     },
+
+    /* -------------------------------------------------------------------------------------------- */
+    //获取功能参数列表
+    createFunParams(roomParamsList) {
+      let funParamsList = [];
+      roomParamsList.forEach((room) => {
+        //获取聊天室功能接口参数 - type：对象数组
+        let funParams = {
+          NAME: this.form.name,
+          FUNC: "2", //签到功能的功能标识符 type：string
+          START_TIME: room.s_time,
+          END_TIME: room.s_time.split(" ")[0] + " " + this.countEndTime(),
+          CREATOR: this.userId - "0", //因为接口要求类型是int
+        };
+        funParamsList.push(funParams);
+      });
+      return funParamsList;
+    },
+
     /* -------------------------------------------------------------------------------------------- */
     /* 获取时间段内属于星期一(*)的日期们
      * begin: 开始时间 "2022-01-05"
@@ -637,6 +668,7 @@ export default {
 
       return result;
     },
+
     /* -------------------------------------------------------------------------------------------- */
     onSubmit() {
       //表单数据未填完则按钮点击无效
@@ -648,13 +680,13 @@ export default {
       ) {
         this.$message.warning("考勤信息未填完");
       } else {
-        //获取参数
-        let paramsList = this.createParams();
+        //获取聊天室创建参数
+        let roomParamsList = this.createRoomParams();
         //请求创建考勤聊天室
-        //paramsList = JSON.stringify(paramsList);
-        console.log(paramsList);
+        //roomParamsList = JSON.stringify(roomParamsList);
+        console.log("聊天室创建信息：", roomParamsList);
         http
-          .addClassRooms(paramsList)
+          .addClassRooms(roomParamsList)
           .then((res) => {
             if (res.code === 20000) {
               this.$message.success("提交成功！");
@@ -665,6 +697,25 @@ export default {
           })
           .catch(() => {
             this.$message.error("提交失败！");
+          });
+
+        /*----------------------------------------------------*/
+        //获取聊天室功能接口参数 - type：对象数组
+        let funParamsList = this.createFunParams(roomParamsList);
+        console.log("聊天室功能信息", funParamsList);
+
+        //发送功能添加请求
+        http
+          .addFunDuration(funParamsList)
+          .then((res) => {
+            if (res.code === 20000) {
+              console.log("功能添加成功！");
+            } else {
+              console.log("功能添加失败！");
+            }
+          })
+          .catch(() => {
+            console.log("功能添加失败！");
           });
       }
     },
