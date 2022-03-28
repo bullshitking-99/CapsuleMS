@@ -591,11 +591,11 @@ export default {
       roomParamsList.forEach((room) => {
         //获取聊天室功能接口参数 - type：对象数组
         let funParams = {
-          NAME: this.form.name,
-          FUNC: "2", //签到功能的功能标识符 type：string
-          START_TIME: room.s_time,
-          END_TIME: room.s_time.split(" ")[0] + " " + this.countEndTime(),
-          CREATOR: this.userId - "0", //因为接口要求类型是int
+          name: this.form.name,
+          func: "2", //签到功能的功能标识符 type：string
+          start_time: room.s_time,
+          end_time: room.s_time.split(" ")[0] + " " + this.countEndTime(),
+          creator: this.userId - "0", //因为接口要求类型是int
         };
         funParamsList.push(funParams);
       });
@@ -706,7 +706,7 @@ export default {
 
         //发送功能添加请求
         http
-          .addFunDuration(funParamsList)
+          .addFunDurations(funParamsList)
           .then((res) => {
             if (res.code === 20000) {
               console.log("功能添加成功！");

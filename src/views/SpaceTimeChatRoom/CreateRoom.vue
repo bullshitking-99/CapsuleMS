@@ -59,17 +59,17 @@ main > div {
   width: 25%;
   height: 80%;
 }
-::v-deep .el-card {
+:deep(.el-card) {
   width: 100%;
   height: 100%;
   border: none;
   transition: all 0.3s;
 }
-::v-deep .el-card:hover {
+:deep(.el-card:hover) {
   transform: scale(1.05);
   box-shadow: 3px 3px 7px #606266;
 }
-::v-deep .el-card__body {
+:deep(.el-card__body) {
   height: 100%;
   background-color: #409eff;
   color: aliceblue;
