@@ -3,13 +3,34 @@
     <header>请选择聊天室类型</header>
     <main>
       <el-card class="classRoom" @click="toAttendance">
-        课堂
+        <div class="card_content">
+          <i class="el-icon-school"></i>
+          <el-divider></el-divider>
+          <div class="card_discription">
+            课堂
+          </div>
+          <el-divider></el-divider>
+        </div>
       </el-card>
       <el-card class="meeting">
-        会议
+        <div class="card_content">
+          <i class="el-icon-office-building"></i>
+          <el-divider></el-divider>
+          <div class="card_discription">
+            会议
+          </div>
+          <el-divider></el-divider>
+        </div>
       </el-card>
       <el-card class="party">
-        派对
+        <div class="card_content">
+          <i class="el-icon-goblet-square-full"></i>
+          <el-divider></el-divider>
+          <div class="card_discription">
+            派对
+          </div>
+          <el-divider></el-divider>
+        </div>
       </el-card>
     </main>
     <footer>@每个类型的聊天室都为专业人士量身定制</footer>
@@ -19,7 +40,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      img_classRoom: "/assets/img/login-bg.jpg",
+    };
   },
   created() {},
   methods: {
@@ -63,7 +86,7 @@ main > div {
   width: 100%;
   height: 100%;
   border: none;
-  transition: all 0.3s;
+  transition: transform 0.3s;
 }
 :deep(.el-card:hover) {
   transform: scale(1.05);
@@ -72,11 +95,30 @@ main > div {
 :deep(.el-card__body) {
   height: 100%;
   background-color: #409eff;
+  border: none;
+}
+
+.card_content {
   color: aliceblue;
-  font-size: 90px;
+  font-size: 45px;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+}
+.card_content i {
+  font-size: 120px;
+  padding: 45px;
+  padding-bottom: 5px;
+}
+.card_content .el-divider {
+  height: 2px;
+  width: 60%;
+  margin: 20%;
+  margin-bottom: 10px;
+}
+.card_content .card_discription {
+  margin-bottom: -15%;
 }
 
 footer {
