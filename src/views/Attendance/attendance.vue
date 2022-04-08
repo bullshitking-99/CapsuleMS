@@ -680,42 +680,35 @@ export default {
       ) {
         this.$message.warning("考勤信息未填完");
       } else {
-        //获取聊天室创建参数
+        /*----------------------------------------------------*/
+        //获取聊天室创建参数 type:对象数组
         let roomParamsList = this.createRoomParams();
-        //请求创建考勤聊天室
-        //roomParamsList = JSON.stringify(roomParamsList);
         console.log("聊天室创建信息：", roomParamsList);
-        http
-          .addClassRooms(roomParamsList)
-          .then((res) => {
-            if (res.code === 20000) {
-              this.$message.success("提交成功！");
-              this.onReset();
-            } else {
-              this.$message.error("提交失败！");
-            }
-          })
-          .catch(() => {
-            this.$message.error("提交失败！");
-          });
 
         /*----------------------------------------------------*/
         //获取聊天室功能接口参数 - type：对象数组
         let funParamsList = this.createFunParams(roomParamsList);
         console.log("聊天室功能信息", funParamsList);
 
-        //发送功能添加请求
+        //聚合聊天室基本信息和功能信息参数 => RoomContext{}
+        let RoomContext = {
+          roomlist: roomParamsList,
+          funclist: funParamsList,
+        };
+
+        //请求创建带有功能的聊天室
         http
-          .addFunDurations(funParamsList)
+          .addClassRooms(RoomContext)
           .then((res) => {
             if (res.code === 20000) {
-              console.log("功能添加成功！");
+              this.$message.success("聊天室添加成功！");
+              this.onReset();
             } else {
-              console.log("功能添加失败！");
+              this.$message.error("聊天室添加失败！");
             }
           })
           .catch(() => {
-            console.log("功能添加失败！");
+            this.$message.error("聊天室添加失败！");
           });
       }
     },
