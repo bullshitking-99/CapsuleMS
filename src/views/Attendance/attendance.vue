@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="document">
     <div class="crumbs" style="display:flex;justify-content:center;">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
@@ -9,10 +9,9 @@
       </el-breadcrumb>
     </div>
 
-    <div
-      class="container"
-      style="width:97%;display:flex;justify-content:center;align-items:center "
-    >
+    <div class="container">
+      <div id="schoolName">北京工业大学</div>
+
       <div class="form-box">
         <!-- 课堂名称与课堂教室 共一个el-form -->
         <el-form label-width="100px">
@@ -42,7 +41,7 @@
           </el-form-item>
 
           <!--学期开始时间-->
-          <el-form-item label="开学时间">
+          <!--           <el-form-item label="开学时间">
             <el-date-picker
               v-model="term_beginTime"
               type="date"
@@ -52,7 +51,7 @@
               @change="getTerm_beginTime"
             >
             </el-date-picker>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
 
         <!-- 课堂日期 使用单选Radio按钮 -->
@@ -145,6 +144,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import http from "@/api/chatroom";
 export default {
   data() {
@@ -160,14 +160,25 @@ export default {
         location: [],
         RESERVE: 0,
       },
+
       //请求获取已有的聊天室地址
       locationList: [],
-      //学期开始时间
+
+      //学校名称
+      schoolName: "",
+
+      //学期开始时间 - 从vuex中获取
       term_beginTime: "",
-      //学期结束时间
+
+      //学期周数 - 从vuex中获取
+      weekNum: "",
+
+      //学期结束时间 - 根据学期开始时间好周数进行计算
       term_endTime: "",
+
       //课程日期
       ClassTime_day: "1",
+
       //级联选择器选项-课堂起始时间
       atdTime_s: [],
       options_s: [
@@ -238,6 +249,7 @@ export default {
           ],
         },
       ],
+
       //级联选择器选项-课堂结束时间
       atdTime_e: [],
       options_e: [
@@ -367,10 +379,14 @@ export default {
   created() {
     this.getUser();
     this.getLocation();
+    this.getSchoolInformation();
   },
   mounted() {},
 
   computed: {
+    //解构mapstate
+    ...mapState(["school"]),
+
     //提交按钮不可选样式
     inputStyle: function() {
       let style = {};
@@ -389,7 +405,38 @@ export default {
   },
 
   methods: {
-    //动态实时修改签到结束时间选项的disabled - 版本2弃用
+    //页面过渡函数，从vuex中获取学校相关信息，并计算所需信息
+    getSchoolInformation() {
+      this.schoolName = this.school.schoolName;
+      this.term_beginTime = this.school.termBeginTime;
+      this.weekNum = this.school.weekNum;
+
+      // console.log("学期开始时间为", this.term_beginTime);
+      // console.log("周数为", this.weekNum);
+
+      //计算学期结束时间 - 开始时间 + 周数 x 7
+      let term_endTime = new Date(this.term_beginTime);
+      term_endTime = term_endTime.setDate(
+        term_endTime.getDate() + this.weekNum * 7
+      ); //变成时间戳
+
+      term_endTime = new Date(term_endTime);
+      this.term_endTime = changeTimeStyle(term_endTime);
+      // console.log("学期结束时间为", this.term_endTime);
+
+      //辅助函数，更改时间格式
+      function changeTimeStyle(oldTime) {
+        // 时间转换
+        let datejson = new Date(oldTime).toJSON();
+        let date = new Date(+new Date(datejson) + 8 * 3600 * 1000)
+          .toISOString()
+          .replace(/T/g, " ")
+          .replace(/\.[\d]{3}Z/, "");
+        return date.split(" ")[0];
+      }
+    },
+
+    //动态实时修改签到结束时间选项的disabled
     /*----------------------------------------------------*/
     changeDisabled_end() {
       //console.log(this.atdTime_s[1]);
@@ -467,30 +514,6 @@ export default {
       var s =
         date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
       return Y + M + D + h + m + s;
-    },
-
-    //用户选择学期开始时间时触发
-    /* -------------------------------------------------------------------------------------------- */
-    getTerm_beginTime() {
-      // console.log(this.term_beginTime);
-      //时间格式转换 函数有点拉，直接toISOstring然后切片就行了
-      let changeTimeStyle = function(oldTime) {
-        // 时间转换
-        let datejson = new Date(oldTime).toJSON();
-        let date = new Date(+new Date(datejson) + 8 * 3600 * 1000)
-          .toISOString()
-          .replace(/T/g, " ")
-          .replace(/\.[\d]{3}Z/, "");
-        return date.split(" ")[0];
-      };
-      this.term_beginTime = changeTimeStyle(this.term_beginTime);
-      //console.log(this.term_beginTime);
-      //获取学期结束时间 133=19*7
-      let term_endTime = new Date(this.term_beginTime);
-      term_endTime = term_endTime.setDate(term_endTime.getDate() + 133); //变成时间戳
-      term_endTime = new Date(term_endTime);
-      this.term_endTime = changeTimeStyle(term_endTime);
-      //console.log(this.term_endTime);
     },
 
     //获取用户信息
@@ -717,3 +740,19 @@ export default {
   },
 };
 </script>
+
+<style>
+#document {
+  height: 90%;
+}
+.container {
+  width: 95%;
+  height: 85%;
+  margin-left: 1%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  padding: 0%;
+}
+</style>
