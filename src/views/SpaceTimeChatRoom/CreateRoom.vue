@@ -38,24 +38,12 @@
       <div id="schoolList" v-if="showSchoolList">
         <el-table
           :data="schoolList"
-          stripe
-          :header-cell-style="headerCellStyle"
-          :cell-style="cellStyle"
           max-height="400"
-          border
+          :header-cell-style="tableHeaderStyle"
+          :cell-style="tableRowStyle"
           @cell-click="chooseSchool"
         >
-          <el-table-column type="expand">
-            <template #default="props">
-              <p>开学日期: {{ props.row.termBeginTime }}</p>
-              <p>学期周数: {{ props.row.weekNum }}</p>
-              <p>上午上课时间: {{ props.row.classBeginTime_morning }}</p>
-              <p>下午上课时间: {{ props.row.classBeginTime_afternoon }}</p>
-              <p>晚上上课时间: {{ props.row.classBeginTime_evening }}</p>
-              <p>每日上课节数: {{ props.row.classNum }}</p>
-            </template>
-          </el-table-column>
-          <el-table-column prop="schoolName" label="学校" />
+          <el-table-column prop="schoolName" label="为每所高校定制专属时空" />
         </el-table>
       </div>
     </main>
@@ -68,19 +56,28 @@ import { mapState, mapMutations } from "vuex"; // 从vuex中导入map解构
 export default {
   data() {
     return {
-      showSchoolList: false,
-      headerCellStyle: {
+      //学校列表表头样式 - shit般的组件，用对象传递样式
+      tableHeaderStyle: {
+        backgroundColor: "#409eff!important",
+        color: "aliceblue",
+        fontWeight: 400,
+        borderRadius: "10px",
         textAlign: "center",
-        color: "black",
+        fontSize: "20px",
+        fontStyle: "italic",
       },
-      cellStyle: {
+      //学校列表行样式
+      tableRowStyle: {
+        borderRadius: "10px",
+        fontSize: "20px",
         textAlign: "center",
         cursor: "pointer",
       },
+      showSchoolList: false,
       schoolList: [
         {
           schoolName: "北京工业大学",
-          termBeginTime: "2021-04-01",
+          termBeginTime: "2022-02-21",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -89,7 +86,7 @@ export default {
         },
         {
           schoolName: "北京大学工业学院",
-          termBeginTime: "2021-04-01",
+          termBeginTime: "2022-04-01",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -98,7 +95,7 @@ export default {
         },
         {
           schoolName: "北京航天大学",
-          termBeginTime: "2021-04-01",
+          termBeginTime: "2022-04-01",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -107,7 +104,7 @@ export default {
         },
         {
           schoolName: "北京理工大学",
-          termBeginTime: "2021-04-01",
+          termBeginTime: "2022-04-01",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -116,7 +113,7 @@ export default {
         },
         {
           schoolName: "北京交通大学",
-          termBeginTime: "2021-04-01",
+          termBeginTime: "2022-04-01",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -203,6 +200,7 @@ https://blog.csdn.net/wsln_123456/article/details/94382333?spm=1001.2101.3001.66
   height: 99%;
   padding: 0;
   position: relative;
+  margin-left: 1%;
 }
 header {
   font-size: 60px;
@@ -277,11 +275,7 @@ footer {
 }
 
 #schoolList {
-  width: 60%;
-}
-
-#schoolList .cell {
-  text-align: center;
+  width: 50%;
 }
 
 .schoolList_show {

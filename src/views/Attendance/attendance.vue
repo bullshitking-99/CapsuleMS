@@ -10,7 +10,9 @@
     </div>
 
     <div class="container">
-      <div id="schoolName">北京工业大学</div>
+      <div id="schoolName">{{ schoolName }}</div>
+
+      <hr />
 
       <div class="form-box">
         <!-- 课堂名称与课堂教室 共一个el-form -->
@@ -741,18 +743,42 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #document {
   height: 90%;
 }
 .container {
-  width: 95%;
-  height: 85%;
+  width: 99%;
+  height: 100%;
+  margin: auto;
   margin-left: 1%;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-wrap: wrap;
   padding: 0%;
+}
+#schoolName {
+  margin: 2% auto;
+  margin-bottom: 1%;
+  text-align: center;
+  color: #409eff;
+  font-size: 40px;
+  font-style: italic;
+}
+
+.container hr {
+  width: 25%;
+  margin: 0 auto;
+  border: 0;
+  height: 2px;
+  background: rgb(21, 173, 86);
+  background: linear-gradient(
+    90deg,
+    rgba(21, 173, 86, 0.30622671431853987) 0%,
+    rgba(64, 158, 255, 1) 50%,
+    rgba(21, 173, 41, 0.2726132689403886) 100%
+  );
+}
+
+.form-box {
+  margin: auto;
+  margin-top: 2%;
 }
 </style>
