@@ -94,14 +94,32 @@
           </el-form-item>
         </el-form>
 
-        <!--签到持续时间-->
-        <el-form>
+        <!--签到持续时间 和 提前签到时间-->
+        <el-form :inline="true" label-width="100px" style="width:800px">
           <el-form-item>
-            <el-form-item label="签到持续时间" label-width="100px">
+            <el-form-item label="签到持续时间">
               <el-select
                 v-model="atd_DuringTime"
-                style="width: 100%"
+                style="width: 190px"
                 placeholder="请选择"
+              >
+                <el-option
+                  v-for="item in time_Options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form-item>
+
+          <el-form-item>
+            <el-form-item label="提前签到时间">
+              <el-select
+                v-model="atd_EarlierTime"
+                style="width: 190px"
+                placeholder="默认为 0"
               >
                 <el-option
                   v-for="item in time_Options"
@@ -130,7 +148,7 @@
           </el-form-item>
         </el-form>
         <!-- 提交与重置按钮 -->
-        <el-form label-width="200px" style="margin-top: 50px">
+        <el-form label-width="230px" style="margin-top: 50px">
           <el-form-item>
             <el-button type="primary" :style="inputStyle" @click="onSubmit"
               >提交</el-button
@@ -339,6 +357,10 @@ export default {
       ],
       //select选择器选项-签到持续时间
       atd_DuringTime: "",
+
+      //select选择器选项-提前签到时间
+      atd_EarlierTime: "",
+
       time_Options: [
         {
           value: "5",
@@ -351,6 +373,10 @@ export default {
         {
           value: "15",
           label: "十五分钟",
+        },
+        {
+          value: "20",
+          label: "二十分钟",
         },
       ],
       //范围滑块-签到周期
@@ -455,19 +481,30 @@ export default {
     },
 
     //获取签到功能的结束时间 但返回的是当日时间 没有日期前缀
+    //若设置了提前签到，则签到结束时间也会提前，这里采用this.form.s_time
     /*----------------------------------------------------*/
     //用个temp感觉很扎眼，肯定可以优化
     countEndTime() {
-      //使用countTime函数得出签到结束时间
-      let duringtime = parseInt(this.atd_DuringTime);
-      //console.log(duringtime);
+      return this.getFuncTime(this.form.s_time, parseInt(this.atd_DuringTime));
+    },
+
+    //计算提前签到时间，第二个参数为负数
+    //该提前签到时间实则为聊天室创建时间，因为聊天室创建时间始终为签到起始时间
+    /*----------------------------------------------------*/
+    countEalierTime() {
+      return this.getFuncTime(
+        this.atdTime_s[1],
+        -parseInt(this.atd_EarlierTime)
+      );
+    },
+
+    //根据聊天室时间roomTime 和 功能持续时间duringTime(分钟) 计算功能时间边界funcTime
+    //当计算提前时间时，可将duringTime取负数传入 : getFuncTime(roomTime,-duringTime)
+    getFuncTime(roomTime, duringTime) {
       let temp = "2020-10-28 "; //单纯为了迎合函数而添加的无用前缀
-      temp = temp + this.atdTime_s[1];
-      let D = this.countTime(temp, "m", duringtime);
-      //this.atdTime_e = D.split(" ")[1]; //这里是课堂结束时间为签到结束时间的老版本
-      return D.split(" ")[1];
-      //console.log(D);
-      //console.log(this.atdTime_e);
+      temp = temp + roomTime;
+      let funcTime = this.countTime(temp, "m", duringTime);
+      return funcTime.split(" ")[1];
     },
 
     /*----------------------------------------------------*/
@@ -584,8 +621,15 @@ export default {
       let classTimeDay_list = weekNumDay_list.slice(startWeek - 1, endWeek);
       //console.log(classTimeDay_list);
 
-      //获取当天签到起始时间与结束时间
+      //获取当天聊天室起始时间与结束时间
       this.form.s_time = this.atdTime_s[1];
+
+      //如果设置了提前签到时间，则聊天室起始时间提前
+      if (this.atd_EarlierTime) {
+        this.form.s_time = this.countEalierTime();
+      }
+
+      //获取当天聊天室结束时间
       this.form.e_time = this.atdTime_e[1];
       //console.log(this.form.s_time);
 
@@ -628,10 +672,12 @@ export default {
     },
 
     /* -------------------------------------------------------------------------------------------- */
-    /* 获取时间段内属于星期一(*)的日期们
-     * begin: 开始时间 "2022-01-05"
-     * end：结束时间
-     * weekNum：星期几 {number} 0-6：周日-周一
+    /**
+     * 获取时间段内属于星期一(*)的日期们
+     * @param begin -  开始时间 "2022-01-05"
+     * @param end - 结束时间
+     * @param weekNum - 星期几 {number} 0-6：周日-周一
+     * @return dateArr - date数组
      */
     getWeek(begin, end, weekNum) {
       var dateArr = new Array();
@@ -778,7 +824,7 @@ export default {
 }
 
 .form-box {
-  margin: auto;
+  margin-left: 25%;
   margin-top: 2%;
 }
 </style>

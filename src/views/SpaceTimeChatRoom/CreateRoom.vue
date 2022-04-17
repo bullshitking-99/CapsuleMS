@@ -151,7 +151,7 @@ export default {
             card.classList.add("disappear");
             setTimeout(() => {
               card.style.display = "none";
-            }, 400);
+            }, 200);
           });
           console.log(card.classList[1] + " is clicked");
         });
@@ -171,7 +171,7 @@ export default {
         this.showSchoolList = true;
         //表格居中
         main.style.justifyContent = "center";
-      }, 500);
+      }, 300);
     },
 
     //学校选项点击事件 => 将学校附带信息存入vuex
@@ -292,5 +292,14 @@ footer {
 .appear {
   transition: opacity 0.3s;
   opacity: 1;
+}
+
+:deep(tbody .cell) {
+  transition: all 0.3s ease;
+}
+
+:deep(tbody .cell:hover) {
+  transform: scale(1.1);
+  color: #000;
 }
 </style>
