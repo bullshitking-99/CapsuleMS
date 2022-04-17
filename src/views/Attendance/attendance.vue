@@ -378,6 +378,10 @@ export default {
           value: "20",
           label: "二十分钟",
         },
+        {
+          value: "30",
+          label: "三十分钟",
+        },
       ],
       //范围滑块-签到周期
       atdWeeks: [15, 50], //除以5就是代表的周数
@@ -404,12 +408,11 @@ export default {
       },
     };
   },
-  created() {
+  mounted() {
     this.getUser();
     this.getLocation();
     this.getSchoolInformation();
   },
-  mounted() {},
 
   computed: {
     //解构mapstate
@@ -560,6 +563,7 @@ export default {
     getUser() {
       this.user = this.$store.state.user;
       this.userId = this.user.id;
+      console.log(this.user.accessfield);
     },
 
     //获取已有的可签到地址 - 结果为数组，元素为对象｛location，field｝
