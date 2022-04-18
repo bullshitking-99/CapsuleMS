@@ -278,7 +278,7 @@ export default {
   height: 1px;
   background-color: #409eff;
 }
-.is-leaf .cell {
+:deep(.is-leaf .cell) {
   text-align: center;
   font-weight: bold;
   color: black;
