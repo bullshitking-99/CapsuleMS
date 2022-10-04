@@ -563,7 +563,6 @@ export default {
     getUser() {
       this.user = this.$store.state.user;
       this.userId = this.user.id;
-      console.log(this.user.accessfield);
     },
 
     //获取已有的可签到地址 - 结果为数组，元素为对象｛location，field｝

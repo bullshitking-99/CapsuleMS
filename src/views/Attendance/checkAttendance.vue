@@ -136,7 +136,7 @@ export default {
       //接口获取该用户的所有签到课堂信息（同名多周课堂会有多个对象，每个对象为一个聊天室
       http.findMyClassRooms(this.userId).then((res) => {
         this.dataWareHouse = res;
-        //console.log(this.dataWareHouse);
+        // console.log("课程列表", this.dataWareHouse);
         res.forEach((element) => {
           this.myClassRoom.push(element.name);
         });

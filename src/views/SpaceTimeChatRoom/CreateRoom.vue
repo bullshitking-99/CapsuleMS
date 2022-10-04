@@ -77,7 +77,7 @@ export default {
       schoolList: [
         {
           schoolName: "北京工业大学",
-          termBeginTime: "2022-02-21",
+          termBeginTime: "2022-08-22",
           weekNum: 19,
           classBeginTime_morning: "08:00",
           classBeginTime_afternoon: "14:00",
@@ -183,7 +183,7 @@ export default {
 
       //将学校信息存入state中
       this.setSchool(row);
-      //console.log("存入学校信息", this.school);
+      console.log("存入学校信息", this.school);
 
       //跳转页面
       this.$router.push("/attendance");
